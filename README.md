@@ -29,7 +29,7 @@ This assignment is to implement a **Neural Transition-Based** Dependency Parsing
   This layer computes the attention scores over the inputs for each step in the decoding process.
 
 ## Assignment-05 (Self-Attention, Transformers, and Pretraining)
-This assignmnet is experience pretraining and how finetuning language models gives access to its hidden knowledge.
+This assignmnet is to experience pretraining and how finetuning a language model gives access to its hidden knowledge.
 * Walking through the minGPT demo provided as most of the code is inherited from it.
 * Implementing the `fintuning` setup to setup the training configurations and save the model.
 * Implementing the naiive approach by predicting *London* for every example in `london_baseline.py`.
