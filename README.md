@@ -33,6 +33,7 @@ This assignmnet is to experience pretraining and how finetuning a language model
 * Walking through the minGPT demo provided as most of the code is inherited from it.
 * Implementing the `fintuning` setup to setup the training configurations and save the model.
 * Implementing the naiive approach by predicting *London* for every example in `london_baseline.py`.
+* Implementing the *Span Corruption Function* to introduce noise to the text by randomly selecting the span to be masked.
 * ...
 
 ## Final Project
