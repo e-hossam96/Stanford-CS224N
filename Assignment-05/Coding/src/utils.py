@@ -62,7 +62,7 @@ def evaluate_places(filepath, predicted_places):
 
   Returns: (total, correct), floats
   """
-  with open(filepath, encoding = 'UTF-8') as fin:
+  with open(filepath) as fin:
     lines = [x.strip().split('\t') for x in fin]
     if len(lines[0]) == 1:
       print('No gold birth places provided; returning (0,0)')

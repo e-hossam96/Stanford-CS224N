@@ -1,5 +1,4 @@
-# import random
-import numpy as np
+import random
 import torch
 from torch.utils.data import Dataset
 import argparse
@@ -169,25 +168,40 @@ class CharCorruptionDataset(Dataset):
 
     def __getitem__(self, idx):
         # TODO [part e]: see spec above
-
+        
         doc = self.data[idx]
-        truncated_len = np.random.randint(4, int(self.block_size * 7 / 8 + 1))
-        doc = doc[:truncated_len]  # Truncate to given length.
-        masked_content_len = truncated_len * np.random.normal(0.25, 0.1)
-        masked_content_len = int(np.clip(masked_content_len, 1, truncated_len - 2))  # Clip invalid random indices.
-        masked_content_idx = np.random.randint(1, truncated_len - masked_content_len)
-        prefix = doc[:masked_content_idx]
-        masked_content = doc[masked_content_idx:masked_content_idx + masked_content_len]
-        suffix = doc[masked_content_idx + masked_content_len:]
-        masked_content = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content  # Rearrange.
-        masked_content += self.PAD_CHAR * (self.block_size - len(masked_content))  # Pad to block_size.
-
-        # Encode into long tensors.
-        x = torch.tensor([self.stoi[c] for c in masked_content[:-1]], dtype=torch.long)
-        y = torch.tensor([self.stoi[c] for c in masked_content[1:]], dtype=torch.long)
-
-        return x, y        
-
+        
+        rand_span = random.randint(4, self.block_size*7/8)
+        assert type(rand_span) == int
+        
+        trunc_doc = doc[:rand_span]
+        
+        norm_span = int(rand_span * abs(random.gauss(0.25, 1.0)))
+        
+        try:
+            start_masked = random.randint(0, rand_span - norm_span)
+        except:
+            start_masked = 0
+        
+        prefix = trunc_doc[:start_masked]
+        masked_content = trunc_doc[start_masked:norm_span + start_masked]
+        suffix = trunc_doc[start_masked + norm_span:]
+        
+        assert prefix + masked_content + suffix == trunc_doc
+        
+        masked_string = prefix + self.MASK_CHAR + suffix + self.MASK_CHAR + masked_content
+        masked_string += self.PAD_CHAR * (self.block_size - len(masked_string))
+        
+        assert type(masked_string) == str
+        
+        inp = masked_string[:-1]
+        out = masked_string[1:]
+        
+        inp = torch.tensor([self.stoi[i] for i in inp], dtype=torch.long)
+        out = torch.tensor([self.stoi[i] for i in out], dtype=torch.long)
+        
+        return inp, out
+        
         # raise NotImplementedError
 
 """
@@ -203,17 +217,17 @@ if __name__ == '__main__':
 
     if args.dataset_type == 'namedata':
         # Even if it hasn't been implemented, we use it to define the vocab
-        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding = 'UTF-8').read(), 128) 
+        corruption_dataset = CharCorruptionDataset(open('wiki.txt').read(), 128) 
         # Make the name dataset
         name_dataset = NameDataset(corruption_dataset,
-            open('birth_places_train.tsv', encoding = 'UTF-8').read())
+            open('birth_places_train.tsv').read())
         for _, example in zip(range(4), name_dataset):
             x, y = example
             print('x:', ''.join([name_dataset.itos[int(c)] for c in x]))
             print('y:', ''.join([name_dataset.itos[int(c)] for c in y]))
         pass
     elif args.dataset_type == 'charcorruption':
-        corruption_dataset = CharCorruptionDataset(open('wiki.txt', encoding = 'UTF-8').read(), 128) 
+        corruption_dataset = CharCorruptionDataset(open('wiki.txt').read(), 128) 
         for _, example in zip(range(4), corruption_dataset):
             x, y = example
             print('x:', ''.join([corruption_dataset.itos[int(c)] for c in x]))
