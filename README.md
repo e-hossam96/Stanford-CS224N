@@ -34,7 +34,7 @@ This assignmnet is to experience pretraining and how finetuning a language model
 * Implementing the `fintuning` setup to setup the training configurations and save the model.
 * Implementing the naiive approach by predicting *London* for every example in `london_baseline.py`.
 * Implementing the *Span Corruption Function* to introduce noise to the text by randomly selecting the span to be masked.
-* ...
+* Implementing the *Synthesizer Attention* which eliminates the **quadratic** regular attention.
 
 ## Final Project
 The chosen final project is **IID SQuAD** in which the **Bidirectional Attention Flow** model in used as the baseline. <br>
