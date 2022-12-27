@@ -42,7 +42,7 @@ device = torch.cuda.current_device() if torch.cuda.is_available() else 'cpu'
 # (that is, the same mapping from character to integer, and we build the 
 # vocab from the pretraining corpus.)
 block_size = 128
-text = open(args.pretrain_corpus_path).read()
+text = open(args.pretrain_corpus_path, encoding='utf-8').read()
 pretrain_dataset = dataset.CharCorruptionDataset(text, block_size)
 
 # We don't suggest you change these hyperparameters, as they're known to work.
@@ -84,7 +84,7 @@ if args.function == 'pretrain':
     #     final_tokens=200*len(pretrain_dataset)*block_size
     #     num_workers=4
     
-    tconf = trainer.TrainerConfig(max_epochs=650, batch_size=128, learning_rate=6e-3, 
+    tconf = trainer.TrainerConfig(max_epochs=100, batch_size=128, learning_rate=6e-3, 
                                   lr_decay=True, warmup_tokens=512*20, 
                                   final_tokens=200*len(pretrain_dataset)*block_size, 
                                   num_workers=4)
@@ -126,17 +126,17 @@ elif args.function == 'finetune':
     #         final_tokens=200*len(pretrain_dataset)*block_size
     #         num_workers=4
     
-    ft_corpus = open(args.finetune_corpus_path).read()
+    ft_corpus = open(args.finetune_corpus_path, encoding='utf-8').read()
     ft_dataset = dataset.NameDataset(pretrain_dataset, ft_corpus)
     
     if args.reading_params_path is None:
-        tconf = trainer.TrainerConfig(max_epochs=75, batch_size=256, learning_rate=6e-4, 
+        tconf = trainer.TrainerConfig(max_epochs=20, batch_size=256, learning_rate=6e-4, 
                                       lr_decay=True, warmup_tokens=512*20, 
                                       final_tokens=200*len(pretrain_dataset)*block_size, 
                                       num_workers=4)
     else:
         model.load_state_dict(torch.load(args.reading_params_path))
-        tconf = trainer.TrainerConfig(max_epochs=10, batch_size=256, learning_rate=6e-4, 
+        tconf = trainer.TrainerConfig(max_epochs=5, batch_size=256, learning_rate=6e-4, 
                                       lr_decay=True, warmup_tokens=512*20, 
                                       final_tokens=200*len(pretrain_dataset)*block_size, 
                                       num_workers=4)
@@ -154,9 +154,9 @@ elif args.function == 'evaluate':
     model.load_state_dict(torch.load(args.reading_params_path))
     correct = 0
     total = 0
-    with open(args.outputs_path, 'w') as fout:
+    with open(args.outputs_path, 'w', encoding='utf-8') as fout:
         predictions = []
-        for line in tqdm(open(args.eval_corpus_path)):
+        for line in tqdm(open(args.eval_corpus_path, encoding='utf-8')):
             x = line.split('\t')[0]
             x = x + '⁇'
             x = torch.tensor([pretrain_dataset.stoi[s] for s in x], dtype=torch.long)[None,...].to(device)
